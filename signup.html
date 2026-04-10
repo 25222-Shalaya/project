@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — EnergyGuard{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container">
+
+        <!-- Left Panel -->
+        <div class="auth-panel-left">
+            <div class="auth-brand-icon">⚡</div>
+            <div class="auth-brand-title">ENERGYGUARD</div>
+            <p class="auth-brand-desc">
+                Join thousands of energy professionals securing their infrastructure
+                with our advanced identity management platform.
+            </p>
+            <ul class="auth-features">
+                <li>
+                    <span class="icon">🔐</span>
+                    Bcrypt password hashing — never stored in plain text
+                </li>
+                <li>
+                    <span class="icon">🛡️</span>
+                    Session-based access control with Flask-Login
+                </li>
+                <li>
+                    <span class="icon">⚡</span>
+                    Real-time energy dashboard after login
+                </li>
+                <li>
+                    <span class="icon">📊</span>
+                    Device monitoring & usage analytics
+                </li>
+                <li>
+                    <span class="icon">✅</span>
+                    SOC 2 compliant audit logging
+                </li>
+            </ul>
+        </div>
+
+        <!-- Right Panel — Form -->
+        <div class="auth-panel-right">
+            <h2 class="auth-form-title">Create your account</h2>
+            <p class="auth-form-subtitle">Start securing your energy systems today.</p>
+
+            <form method="POST" action="{{ url_for('signup') }}" novalidate>
+
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input id="username" name="username" type="text" class="form-input" placeholder="e.g. john_doe"
+                            required minlength="3" autocomplete="username" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📧</span>
+                        <input id="email" name="email" type="email" class="form-input" placeholder="you@example.com"
+                            required autocomplete="email" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input id="password" name="password" type="password" class="form-input"
+                            placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirm_password">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔑</span>
+                        <input id="confirm_password" name="confirm_password" type="password" class="form-input"
+                            placeholder="Re-enter your password" required autocomplete="new-password" />
+                    </div>
+                </div>
+
+                <button id="signup-btn" type="submit" class="btn btn-primary btn-full">
+                    🚀 Create Account
+                </button>
+
+                <div class="form-footer">
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Sign in →</a></p>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

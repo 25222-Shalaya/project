@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — EnergyGuard{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Dashboard Header ── -->
+<div class="dashboard-header">
+    <div class="dashboard-title-group">
+        <div class="dashboard-title">⚡ Energy System Dashboard</div>
+        <div class="dashboard-subtitle">
+            Welcome to Energy System Dashboard, <strong>{{ current_user.username }}</strong> 👋 &nbsp;|&nbsp;
+            Logged in as <code>{{ current_user.email }}</code>
+        </div>
+    </div>
+    <div class="dashboard-meta">
+        <div class="status-badge">
+            <span class="status-dot"></span> Grid Online
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger" id="logout-btn"
+            style="padding:7px 16px;font-size:0.85rem;">
+            🚪 Logout
+        </a>
+    </div>
+</div>
+
+<!-- ── Stats Row ── -->
+<div class="dashboard-grid">
+
+    <div class="cards-row">
+        <div class="stat-card cyan">
+            <div class="stat-card-header">
+                <span class="stat-card-label">Today's Usage</span>
+                <span class="stat-card-icon">⚡</span>
+            </div>
+            <div class="stat-card-value">{{ energy.today_usage }}</div>
+            <div class="stat-card-sub">kWh consumed today</div>
+        </div>
+
+        <div class="stat-card green">
+            <div class="stat-card-header">
+                <span class="stat-card-label">Solar Generation</span>
+                <span class="stat-card-icon">☀️</span>
+            </div>
+            <div class="stat-card-value">{{ energy.solar_today }}</div>
+            <div class="stat-card-sub">kWh from solar today</div>
+        </div>
+
+        <div class="stat-card amber">
+            <div class="stat-card-header">
+                <span class="stat-card-label">Grid Load</span>
+                <span class="stat-card-icon">📡</span>
+            </div>
+            <div class="stat-card-value">{{ energy.grid_load }}%</div>
+            <div class="stat-card-sub">current grid utilisation</div>
+        </div>
+
+        <div class="stat-card purple">
+            <div class="stat-card-header">
+                <span class="stat-card-label">CO₂ Saved</span>
+                <span class="stat-card-icon">🌿</span>
+            </div>
+            <div class="stat-card-value">{{ energy.co2_saved }}</div>
+            <div class="stat-card-sub">kg CO₂ offset today</div>
+        </div>
+
+        <div class="stat-card red">
+            <div class="stat-card-header">
+                <span class="stat-card-label">Cost Today</span>
+                <span class="stat-card-icon">💰</span>
+            </div>
+            <div class="stat-card-value">${{ energy.cost_today }}</div>
+            <div class="stat-card-sub">estimated energy cost</div>
+        </div>
+    </div>
+
+    <!-- ── Chart + Devices Row ── -->
+    <div class="two-col-row">
+
+        <!-- 7-Day Chart -->
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <span class="chart-title">📈 7-Day Energy Consumption</span>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#00d4ff;"></div> Grid Usage
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#00ff88;"></div> Solar
+                    </div>
+                </div>
+            </div>
+            <canvas id="energyChart" height="100"></canvas>
+        </div>
+
+        <!-- Devices -->
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <span class="chart-title">🔌 Connected Devices</span>
+            </div>
+            <div class="devices-grid">
+                {% for device in energy.devices %}
+                <div class="device-item">
+                    <div class="device-icon">{{ device.icon }}</div>
+                    <div class="device-info">
+                        <div class="device-name">{{ device.name }}</div>
+                        <div class="device-usage">{{ device.usage }} kWh</div>
+                    </div>
+                    <span class="device-status {{ device.status }}">{{ device.status }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── Alerts ── -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <span class="chart-title">🚨 System Alerts</span>
+        </div>
+        <div class="alerts-list">
+            {% for alert in energy.alerts %}
+            <div class="alert-item {{ alert.type }}">
+                {% if alert.type == 'warning' %}⚠️
+                {% elif alert.type == 'success' %}✅
+                {% else %}ℹ️{% endif %}
+                {{ alert.msg }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if current_user.username == 'admin' %}
+    <!-- ── Admin Panel ── -->
+    <div class="chart-card" style="grid-column: 1 / -1; margin-top: 1.5rem;">
+        <div class="chart-card-header">
+            <span class="chart-title">🛡️ Admin Panel - Registered Users</span>
+        </div>
+        <div style="overflow-x: auto; padding: 15px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; color: #8ba3c9;">
+                <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <th style="padding: 12px 10px; font-weight: 600;">ID</th>
+                        <th style="padding: 12px 10px; font-weight: 600;">Username</th>
+                        <th style="padding: 12px 10px; font-weight: 600;">Email</th>
+                        <th style="padding: 12px 10px; font-weight: 600;">Status</th>
+                        <th style="padding: 12px 10px; font-weight: 600;">Last Login</th>
+                        <th style="padding: 12px 10px; font-weight: 600;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in all_users %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 12px 10px;">{{ u.id }}</td>
+                        <td style="padding: 12px 10px; color: #e8f4fd;">{{ u.username }}</td>
+                        <td style="padding: 12px 10px;">{{ u.email }}</td>
+                        <td style="padding: 12px 10px;">
+                            {% if u.is_active %}
+                                <span style="display: inline-block; padding: 4px 10px; border-radius: 20px; background: rgba(0, 255, 136, 0.1); color: #00ff88; font-size: 0.8em; font-weight: 600;">Activated</span>
+                            {% else %}
+                                <span style="display: inline-block; padding: 4px 10px; border-radius: 20px; background: rgba(255, 77, 77, 0.1); color: #ff4d4d; font-size: 0.8em; font-weight: 600;">Deactivated</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px 10px; font-size: 0.85em; opacity: 0.85;">
+                            {% if u.last_login %}
+                                {{ u.last_login.strftime('%Y-%m-%d %H:%M') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px 10px;">
+                            {% if u.username != 'admin' %}
+                            <form action="{{ url_for('delete_user', user_id=u.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to remove this user?');">
+                                <button type="submit" style="background: rgba(255, 77, 77, 0.1); border: 1px solid rgba(255, 77, 77, 0.3); color: #ff4d4d; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85em; transition: 0.2s;" onmouseover="this.style.background='rgba(255, 77, 77, 0.2)'" onmouseout="this.style.background='rgba(255, 77, 77, 0.1)'">
+                                    🗑️ Remove
+                                </button>
+                            </form>
+                            {% else %}
+                            <span style="color: grey; font-size: 0.85em;">N/A</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const labels = {{ energy.chart_labels | tojson }};
+    const usage = {{ energy.chart_usage  | tojson }};
+    const solar = {{ energy.chart_solar  | tojson }};
+
+    const ctx = document.getElementById('energyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Grid Usage (kWh)',
+                    data: usage,
+                    borderColor: '#00d4ff',
+                    backgroundColor: 'rgba(0,212,255,0.08)',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#00d4ff',
+                    pointRadius: 4,
+                    tension: 0.4,
+                    fill: true,
+                },
+                {
+                    label: 'Solar (kWh)',
+                    data: solar,
+                    borderColor: '#00ff88',
+                    backgroundColor: 'rgba(0,255,136,0.06)',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#00ff88',
+                    pointRadius: 4,
+                    tension: 0.4,
+                    fill: true,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(13,22,41,0.95)',
+                    borderColor: 'rgba(0,212,255,0.3)',
+                    borderWidth: 1,
+                    titleColor: '#e8f4fd',
+                    bodyColor: '#8ba3c9',
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    ticks: { color: '#8ba3c9', font: { size: 11 } }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    ticks: { color: '#8ba3c9', font: { size: 11 } }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

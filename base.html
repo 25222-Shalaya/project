@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}EnergyGuard — Identity Security Framework{% endblock %}</title>
+    <meta name="description" content="Secure identity and access management for modern energy infrastructure." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- ── Navbar ── -->
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="navbar-brand">
+            <div class="navbar-logo">⚡</div>
+            <span class="navbar-title">ENERGYGUARD</span>
+        </a>
+        <ul class="navbar-nav">
+            {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a></li>
+            <li><a href="{{ url_for('logout') }}" class="nav-link">Logout</a></li>
+            {% else %}
+            <li><a href="{{ url_for('home') }}" class="nav-link">Home</a></li>
+            <li><a href="{{ url_for('login') }}" class="nav-link">Login</a></li>
+            <li><a href="{{ url_for('signup') }}" class="nav-link btn-nav">Get Started</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- ── Flash Messages ── -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {% if category == 'success' %}✅{% elif category == 'danger' %}❌{% elif category == 'warning' %}⚠️{% else
+            %}ℹ️{% endif %}
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ── Page Content ── -->
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+        © 2026 EnergyGuard · Identity Security Framework for Energy Systems
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

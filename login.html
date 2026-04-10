@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Login — EnergyGuard{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container">
+
+        <!-- Left Panel -->
+        <div class="auth-panel-left">
+            <div class="auth-brand-icon">🔐</div>
+            <div class="auth-brand-title">SECURE ACCESS</div>
+            <p class="auth-brand-desc">
+                Sign in to your EnergyGuard account to monitor and manage your
+                energy infrastructure in real-time.
+            </p>
+            <ul class="auth-features">
+                <li>
+                    <span class="icon">⚡</span>
+                    Live energy usage monitoring
+                </li>
+                <li>
+                    <span class="icon">🔌</span>
+                    Connected device management
+                </li>
+                <li>
+                    <span class="icon">📈</span>
+                    7-day consumption analytics
+                </li>
+                <li>
+                    <span class="icon">☀️</span>
+                    Solar generation tracking
+                </li>
+                <li>
+                    <span class="icon">🚨</span>
+                    Real-time security alerts
+                </li>
+            </ul>
+        </div>
+
+        <!-- Right Panel — Form -->
+        <div class="auth-panel-right">
+            <h2 class="auth-form-title">Welcome back</h2>
+            <p class="auth-form-subtitle">Enter your credentials to access the dashboard.</p>
+
+            <form method="POST" action="{{ url_for('login') }}" novalidate>
+
+                <div class="form-group">
+                    <label class="form-label" for="identifier">Username or Email</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input id="identifier" name="identifier" type="text" class="form-input"
+                            placeholder="Username or email address" required autocomplete="username" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input id="password" name="password" type="password" class="form-input"
+                            placeholder="Your password" required autocomplete="current-password" />
+                    </div>
+                </div>
+
+                <div class="remember-row">
+                    <label class="checkbox-label" for="remember">
+                        <input type="checkbox" id="remember" name="remember" />
+                        Remember me
+                    </label>
+                </div>
+
+                <button id="login-btn" type="submit" class="btn btn-primary btn-full">
+                    🔐 Sign In
+                </button>
+
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="{{ url_for('signup') }}">Register now →</a></p>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
